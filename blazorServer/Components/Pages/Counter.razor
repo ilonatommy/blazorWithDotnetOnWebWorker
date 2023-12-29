@@ -1,0 +1,57 @@
+﻿@page "/counter"
+@rendermode InteractiveServer
+@inject IJSRuntime JSRuntime
+
+<!-- scrip loading here should not be needed but it fails without it -->
+<script src="dotnet/main.js"></script>
+
+<PageTitle>Counter</PageTitle>
+
+<h1>Counter</h1>
+
+<p role="status">Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<button @onclick="StartDotnet">Start Dotnet</button>
+<button @onclick="GenerateQR">Generate QR</button>
+
+@code {
+    private int currentCount = 0;
+    private bool dotnetStarted = false;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+    private async Task StartDotnet()
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("mainThread.setUpWorker");
+            await JSRuntime.InvokeVoidAsync("mainThread.launchDotnet");
+            dotnetStarted = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+    private async Task GenerateQR()
+    {
+        try
+        {
+            if (dotnetStarted)
+            {
+                await JSRuntime.InvokeVoidAsync("mainThread.generate");
+            }
+            else
+            {
+                Console.WriteLine("Dotnet not started, press the other button first");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+}
