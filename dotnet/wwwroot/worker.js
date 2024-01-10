@@ -37,7 +37,7 @@ async function startDotnet(){
         assemblyExports = await getAssemblyExports(config.mainAssemblyName);
     
         self.postMessage("setting imports");
-        setModuleImports("dotnetWorker.js", {
+        setModuleImports("worker.js", {
             QRGenerator: {
                 sendErrorMessage
             }

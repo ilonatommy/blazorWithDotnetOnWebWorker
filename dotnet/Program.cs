@@ -13,7 +13,7 @@ public partial class QRGenerator
     private static readonly int MAX_QR_SIZE = 20;
 
     [JSExport]
-    internal static string Generate(string text, int qrSize)
+    internal static byte[] Generate(string text, int qrSize)
     {
         if (qrSize >= MAX_QR_SIZE)
         {
@@ -23,7 +23,7 @@ public partial class QRGenerator
         QRCodeGenerator qrGenerator = new QRCodeGenerator();
         QRCodeData qrCodeData = qrGenerator.CreateQrCode("The text which should be encoded.", QRCodeGenerator.ECCLevel.Q);
         BitmapByteQRCode qrCode = new BitmapByteQRCode(qrCodeData);
-        return Convert.ToBase64String(qrCode.GetGraphic(qrSize));
+        return qrCode.GetGraphic(qrSize);
     }
 
     [JSImport("QRGenerator.sendErrorMessage", "dotnetWorker.js")]
