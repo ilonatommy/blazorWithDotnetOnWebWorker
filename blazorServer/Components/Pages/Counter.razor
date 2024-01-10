@@ -27,8 +27,8 @@
     {
         try
         {
-            await JSRuntime.InvokeVoidAsync("mainThread.setUpWorker");
-            await JSRuntime.InvokeVoidAsync("mainThread.launchDotnet");
+            await JSRuntime.InvokeVoidAsync("clientFunctions.setUpWorker");
+            await JSRuntime.InvokeVoidAsync("clientFunctions.launchDotnet");
             dotnetStarted = true;
         }
         catch (Exception ex)
@@ -42,7 +42,7 @@
         {
             if (dotnetStarted)
             {
-                await JSRuntime.InvokeVoidAsync("mainThread.generate");
+                await JSRuntime.InvokeVoidAsync("clientFunctions.generate");
             }
             else
             {
