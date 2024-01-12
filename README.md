@@ -1,11 +1,15 @@
 # Startup
 
-```bash
-./build.cmd
-dotnet run -p blazorServer/blazorServer.csproj
-```
+Windows:
 
 ```bash
-./build.sh
-dotnet run -p blazorServer/blazorServer.csproj
+./run.cmd cleanbuild
+./run.cmd run
+```
+
+Linux:
+
+```bash
+./run.sh cleanbuild
+./run.sh run
 ```
