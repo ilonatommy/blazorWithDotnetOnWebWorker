@@ -16,7 +16,7 @@ action="$1"
 # Define functions
 build() {
     dotnet publish -c Debug "dotnet/QRGenerator.csproj"
-    dotnet publish -c Debug "blazorServer/blazorServer.csproj"
+    dotnet publish -c Debug "blazorWasm/blazorWasm.csproj"
     exit 0
 }
 
@@ -24,9 +24,9 @@ clean() {
     echo "Cleaning the previous build..."
     dotnetBin="dotnet/bin"
     dotnetObj="dotnet/obj"
-    blazorBin="blazorServer/bin"
-    blazorObj="blazorServer/obj"
-    dotnetPublish="blazorServer/wwwroot/dotnet"
+    blazorBin="blazorWasm/bin"
+    blazorObj="blazorWasm/obj"
+    dotnetPublish="blazorWasm/wwwroot/dotnet"
 
     for dir in "$dotnetBin" "$dotnetObj" "$blazorBin" "$blazorObj" "$dotnetPublish"; do
         [ -d "$dir" ] && rm -rf "$dir"
@@ -48,7 +48,7 @@ case "$action" in
         build
         ;;
     run)
-        dotnet run -p "blazorServer/blazorServer.csproj"
+        dotnet run --project "blazorWasm/blazorWasm.csproj"
         ;;
     *)
         echo "Invalid action: $action"
