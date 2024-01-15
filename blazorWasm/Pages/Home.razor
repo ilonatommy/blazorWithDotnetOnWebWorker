@@ -1,0 +1,101 @@
+﻿@page "/"
+@using System.Runtime.InteropServices.JavaScript;
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+<Popup @ref="popup" />
+
+@if (exportsReady)
+{
+    <div class="input-container">
+    <div class="form-group">
+        <label for="textInput">Generate a QR from text:</label>
+        <input type="text" class="form-control" id="textInput" @bind="Text" />
+    </div>
+
+    <div class="form-group">
+        <label for="numberInput">Set size of QR (in pixels):</label>
+        <input type="number" class="form-control" id="numberInput" @bind="Size" />
+    </div>
+    @if (!string.IsNullOrWhiteSpace(Text) && Size > 0)
+    {
+        <div class="form-group">
+            <button class="btn btn-primary" @onclick="GenerateQR">Generate QR</button>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(ImageUrl))
+        {
+            <div class="form-group">
+                <img class="image" src="@ImageUrl" id="qrImage" alt="Image" />
+            </div>
+        }
+    }
+</div>
+}
+else
+{
+     <div class="text-center">
+       <p>Loading...</p>
+    </div>
+}
+
+
+@code {
+    string ID;
+    string ImageUrl = string.Empty;
+    bool exportsReady;
+    bool dotnetStarted;
+    string Text = string.Empty;
+    int Size = 5;
+    Popup popup = new Popup();
+
+    public Home()
+    {
+        ID = Guid.NewGuid().ToString();
+    }
+
+    protected override void OnInitialized() => ClientInterop.HomeInstances.Add(ID, this);
+    
+    public void Dispose() => ClientInterop.HomeInstances.Remove(ID);
+
+    public void SetExportsReady()
+    {
+        exportsReady = true;
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void UpdateImage(string url)
+    {
+        ImageUrl = url;
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void DisplayError(string message)
+    {
+        ImageUrl = string.Empty;
+        InvokeAsync(StateHasChanged);
+        popup.Show(title: "Error", message: message);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (dotnetStarted)
+            return;
+        await JSHost.ImportAsync(
+            moduleName: nameof(ClientInterop),
+            moduleUrl: $"../Pages/Home.razor.js");
+        ClientInterop.SetUpWorker(ID);
+        ClientInterop.LaunchDotnet();
+        dotnetStarted = true;
+    }
+
+    private void GenerateQR()
+    {
+        if (!exportsReady)
+        {
+            throw new Exception("Exports not ready yet, cannot generate QR code");
+        }
+        ClientInterop.GenerateQR(Text, Size);
+    }
+}

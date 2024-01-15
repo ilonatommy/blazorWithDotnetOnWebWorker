@@ -18,8 +18,8 @@ self.addEventListener('message', async function(e) {
             const text = e.data.text;
             if (size === undefined || text === undefined)
                 new Error("Inner error, got empty QR generation data from React");
-            const image = assemblyExports.QRGenerator.Generate(text, size);
-            self.postMessage({ command: "generateQRCodeResponse", image: image });
+            const imageBytes = assemblyExports.QRGenerator.Generate(text, size);
+            self.postMessage({ command: "generateQRCodeResponse", image: imageBytes.buffer }, [imageBytes.buffer]);
         default:
             self.postMessage(e.data.command);
             break;

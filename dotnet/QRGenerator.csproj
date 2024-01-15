@@ -5,7 +5,7 @@
     <WasmMainJSPath>main.js</WasmMainJSPath>
     <OutputType>Exe</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <PublishDir>../blazorServer/wwwroot/dotnet</PublishDir>
+    <PublishDir>../blazorWasm/wwwroot/dotnet</PublishDir>
   </PropertyGroup>
 
   <ItemGroup>
