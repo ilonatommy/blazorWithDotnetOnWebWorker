@@ -1,20 +1,20 @@
 using System.Runtime.InteropServices.JavaScript;
 using System.Runtime.Versioning;
 using System.Collections.Generic;
-using blazorWasm.Pages;
+using Pages;
 
 [SupportedOSPlatform("browser")]
-public partial class ClientInterop
+public partial class Client
 {
     public static Dictionary<string, Home> HomeInstances = new();
 
-    [JSImport("setUpWorker", nameof(ClientInterop))]
+    [JSImport("setUpWorker", nameof(Client))]
     public static partial void SetUpWorker(string id);
 
-    [JSImport("launchDotnet", nameof(ClientInterop))]
+    [JSImport("launchDotnet", nameof(Client))]
     public static partial void LaunchDotnet();
 
-    [JSImport("generate", nameof(ClientInterop))]
+    [JSImport("generate", nameof(Client))]
     public static partial void GenerateQR(string text, int size);
 
     [JSExport]

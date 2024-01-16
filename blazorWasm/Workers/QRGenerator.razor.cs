@@ -7,8 +7,6 @@ using QRCoder;
 
 // https://github.com/codebude/QRCoder
 
-Console.WriteLine("Hello, Browser!");
-
 [SupportedOSPlatform("browser")]
 public partial class QRGenerator
 {
@@ -28,6 +26,6 @@ public partial class QRGenerator
         return qrCode.GetGraphic(qrSize);
     }
 
-    [JSImport("QRGenerator.sendErrorMessage", "worker.js")]
+    [JSImport("QRGenerator.sendErrorMessage", "worker.razor.js")]
     internal static partial void SendErrorMessage(string message);
 }

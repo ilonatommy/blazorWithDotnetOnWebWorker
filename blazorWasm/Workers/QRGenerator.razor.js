@@ -1,6 +1,6 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-import { dotnet, exit } from './_framework/dotnet.js'
+import { dotnet, exit } from '../_framework/dotnet.js'
 
 let assemblyExports = null;
 
@@ -37,7 +37,7 @@ async function startDotnet(){
         assemblyExports = await getAssemblyExports(config.mainAssemblyName);
     
         self.postMessage("setting imports");
-        setModuleImports("worker.js", {
+        setModuleImports("worker.razor.js", {
             QRGenerator: {
                 sendErrorMessage
             }
