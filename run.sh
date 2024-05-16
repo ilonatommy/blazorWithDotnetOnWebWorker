@@ -15,20 +15,17 @@ action="$1"
 
 # Define functions
 build() {
-    dotnet publish -c Debug "dotnet/QRGenerator.csproj"
     dotnet publish -c Debug "blazorWasm/blazorWasm.csproj"
     exit 0
 }
 
 clean() {
     echo "Cleaning the previous build..."
-    dotnetBin="dotnet/bin"
-    dotnetObj="dotnet/obj"
     blazorBin="blazorWasm/bin"
     blazorObj="blazorWasm/obj"
     dotnetPublish="blazorWasm/wwwroot/dotnet"
 
-    for dir in "$dotnetBin" "$dotnetObj" "$blazorBin" "$blazorObj" "$dotnetPublish"; do
+    for dir in "$blazorBin" "$blazorObj" "$dotnetPublish"; do
         [ -d "$dir" ] && rm -rf "$dir"
     done
 
