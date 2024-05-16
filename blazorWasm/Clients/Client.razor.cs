@@ -1,3 +1,6 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
 using System.Runtime.InteropServices.JavaScript;
 using System.Runtime.Versioning;
 using System.Collections.Generic;
@@ -6,23 +9,20 @@ using Pages;
 [SupportedOSPlatform("browser")]
 public partial class Client
 {
-    public static Dictionary<string, Home> HomeInstances = new();
+    private static bool workerDotnetStarted;
 
-    [JSImport("setUpWorker", nameof(Client))]
-    public static partial void SetUpWorker(string id);
+    public static async Task InitClient()
+    {
+        if(workerDotnetStarted)
+        {
+            return;
+        }
+        workerDotnetStarted = true;
+        await JSHost.ImportAsync(
+            moduleName: nameof(Client),
+            moduleUrl: $"../Clients/Client.razor.js");
+    }
 
-    [JSImport("launchDotnet", nameof(Client))]
-    public static partial void LaunchDotnet();
-
-    [JSImport("generate", nameof(Client))]
-    public static partial void GenerateQR(string text, int size);
-
-    [JSExport]
-    public static void SetExportsReady(string id) => HomeInstances[id].SetExportsReady();
-
-    [JSExport]
-    public static void UpdateImage(string id, string url) => HomeInstances[id].UpdateImage(url);
-
-    [JSExport]
-    public static void DisplayError(string id, string message) => HomeInstances[id].DisplayError(message);
+    [JSImport("generateQR", nameof(Client))]
+    public static partial Task<string> GenerateQR(string text, int size);
 }

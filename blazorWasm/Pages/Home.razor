@@ -1,4 +1,7 @@
-﻿@page "/"
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+@page "/"
 @using Components
 @namespace Pages
 
@@ -8,9 +11,7 @@
 
 <Popup @ref="popup" />
 
-@if (exportsReady)
-{
-    <div class="input-container">
+<div class="input-container">
     <div class="form-group">
         <label for="textInput">Generate a QR from text:</label>
         <input type="text" class="form-control" id="textInput" @bind="text" />
@@ -30,10 +31,3 @@
         </div>
     }
 </div>
-}
-else
-{
-     <div class="text-center">
-       <p>Loading...</p>
-    </div>
-}

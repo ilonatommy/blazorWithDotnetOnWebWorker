@@ -1,59 +1,44 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-import { dotnet, exit } from '../_framework/dotnet.js'
+
+import { dotnet } from '../_framework/dotnet.js'
 
 let assemblyExports = null;
+let startupError = undefined;
 
-self.addEventListener('message', async function(e) {
-    switch (e.data.command)
-    {
-        case "startDotnet":
-            console.log("Starting dotnet, says the worker");
-            await startDotnet();
-            break;
-        case "generateQRCode":
-            if (!assemblyExports)
-                throw new Error("Exports not found");
-            const size = Number(e.data.size);
-            const text = e.data.text;
-            if (size === undefined || text === undefined)
-                new Error("Inner error, got empty QR generation data from React");
-            const imageBytes = assemblyExports.QRGenerator.Generate(text, size);
-            self.postMessage({ command: "generateQRCodeResponse", image: imageBytes.buffer }, [imageBytes.buffer]);
-        default:
-            self.postMessage(e.data.command);
-            break;
-    }
-    }, false);
+try {
+    const { getAssemblyExports, getConfig } = await dotnet.create();
+    const config = getConfig();
+    assemblyExports = await getAssemblyExports(config.mainAssemblyName);
+}
+catch (err) {
+    startupError = err.message;
+}
 
-async function startDotnet(){
+self.addEventListener('message', async function (e) {
     try {
-        self.postMessage("creating dotnet");
-        const { setModuleImports, getAssemblyExports, getConfig } = await dotnet
-            .create();
-        self.postMessage("getting config");
-        const config = getConfig();
-        self.postMessage("getting exports");
-        assemblyExports = await getAssemblyExports(config.mainAssemblyName);
-    
-        self.postMessage("setting imports");
-        setModuleImports("worker.razor.js", {
-            QRGenerator: {
-                sendErrorMessage
-            }
+        if (!assemblyExports) {
+            throw new Error(startupError || "worker exports not loaded");
+        }
+        let result = null;
+        switch (e.data.command) {
+            case "generateQR":
+                result = assemblyExports.QRGenerator.Generate(e.data.text, e.data.size);
+                break;
+            default:
+                throw new Error("Unknown command: " + e.data.command);
+        }
+        self.postMessage({
+            command: "response",
+            requestId: e.data.requestId,
+            result,
         });
-    
-        self.postMessage({ command: "exportsReady" });
-        self.postMessage("starting dotnet");
-        await dotnet.run();
     }
     catch (err) {
-        console.log(`err: ${err}; ${err.message}`);
-        exit(2, err);
+        self.postMessage({
+            command: "response",
+            requestId: e.data.requestId,
+            error: err.message,
+        });
     }
-}
-
-export function sendErrorMessage(message) {
-    console.log(`sendErrorMessage is passing message: ${message}`);
-    self.postMessage({ command: "error", message: message });
-}
+}, false);
